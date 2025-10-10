@@ -3,11 +3,12 @@ from agents import (
     OpenAIChatCompletionsModel,
     function_tool, FunctionTool
 )
+from langchain_core.tools import tool
 from constants.llms.models import chain 
 from constants.connection.neo4j_connection import connection
 from constants.prompts import Prompts
 
-@function_tool
+@tool
 def neo4j_tool(query: str=None):
     """
     Generate and execute a Cypher query against the Neo4j database.

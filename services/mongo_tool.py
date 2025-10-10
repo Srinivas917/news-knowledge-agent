@@ -3,9 +3,17 @@ from agents import (
     OpenAIChatCompletionsModel,
     function_tool, FunctionTool
 )
-from constants.vectorStore import vector_store
+from langchain_core.tools import tool
+# from constants.vectorStore import vector_store
+from langchain.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.memory import VectorStoreRetrieverMemory
+import os
 
-@function_tool
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+FAISS_PATH = os.path.join(BASE_DIR, "faiss_index")
+vector_store =  FAISS.load_local(FAISS_PATH,embeddings=HuggingFaceEmbeddings(),allow_dangerous_deserialization=True)
+@tool
 def mongo_tool(query: str=None):
     """
     Fetch article IDs from MongoDB based on content similarity to the query.
@@ -21,7 +29,7 @@ def mongo_tool(query: str=None):
         """
     
     
-        
+    # vector_store =  FAISS.load_local("faiss_index",embeddings=HuggingFaceEmbeddings(),allow_dangerous_deserialization=True)
     results = vector_store.similarity_search(query, k=5) 
     article_map = {str(insight.metadata["article_id"]): insight for insight in results}
     print(list(article_map.keys()))

@@ -5,7 +5,8 @@ import asyncio
 import nest_asyncio
 from langchain.callbacks.streamlit import StreamlitCallbackHandler
 from llmAgents.query_agent import query_agent
-from constants.vectorStore import vector_store, memory, retriever
+from langchain.memory import VectorStoreRetrieverMemory
+from services.mongo_tool import vector_store
 from agents import Runner
 from constants.llms import models
 
@@ -14,6 +15,8 @@ st.set_page_config(page_title="News Knowledge Agent", page_icon="📰", layout="
 st.title("News Knowledge Agent")
 
 # ✅ Initialize vector store & memory
+retriever = vector_store.as_retriever(search_kwargs={"k": 5})
+memory = VectorStoreRetrieverMemory(retriever=retriever, memory_key="chat_history")
 if "vector_store" not in st.session_state:
     with st.spinner("Creating vector store..."):
         st.session_state.vector_store = vector_store

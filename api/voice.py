@@ -5,18 +5,22 @@ import streamlit as st
 import asyncio
 import nest_asyncio
 from langchain.callbacks.streamlit import StreamlitCallbackHandler
-from llmAgents.query_agent import query_agent
-from constants.vectorStore import vector_store, memory, retriever
+from llmAgents.query_agent import agent_executor
+#from constants.vectorStore import vector_store, memory, retriever
 from agents import Runner
 import numpy as np
 import soundfile as sf
 from constants.llms import models
+from langchain.memory import VectorStoreRetrieverMemory
+from services.mongo_tool import vector_store
 
 nest_asyncio.apply()
 st.set_page_config(page_title="News Knowledge Agent", page_icon="📰", layout="wide")
 st.title("News Knowledge Agent")
 
 # ✅ Initialize vector store & memory
+retriever = vector_store.as_retriever(search_kwargs={"k": 5})
+memory = VectorStoreRetrieverMemory(retriever=retriever, memory_key="chat_history")
 if "vector_store" not in st.session_state:
     with st.spinner("Creating vector store..."):
         st.session_state.vector_store = vector_store
@@ -35,7 +39,7 @@ if "main_answered" not in st.session_state:
     st.session_state.main_answered = False
 
 if st.session_state.messages:
-    
+    # st.markdown("### 💬 Conversation History")
     for msg in st.session_state.messages:
         if msg["role"] == "user":
             st.markdown(f"**🧑 You:** {msg['content']}")
@@ -99,7 +103,11 @@ with st.container():
             try:
                 st_callback_container = st.container()
                 st_callback = StreamlitCallbackHandler(st_callback_container)
-                response = asyncio.run(Runner.run(query_agent, system_message))
+                response = agent_executor.invoke(
+                    {"input":user_query
+                    },
+                     {"callbacks":[st_callback]}
+                )
             except Exception as e:
                 error_message = f"Sorry, an error occurred: {e}"
                 st.error(error_message)
@@ -108,7 +116,7 @@ with st.container():
                 )
                 st.stop()
 
-        answer_text = str(response.final_output)
+        answer_text = str(response["output"])
         st.session_state.messages.append({"role": "assistant", "content": answer_text})
         st.session_state.main_answered = True
 
