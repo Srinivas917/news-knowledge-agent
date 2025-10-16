@@ -13,7 +13,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 FAISS_PATH = os.path.join(BASE_DIR, "faiss_index")
 vector_store =  FAISS.load_local(FAISS_PATH,embeddings=HuggingFaceEmbeddings(),allow_dangerous_deserialization=True)
-@tool
+@function_tool
 def mongo_tool(query: str=None):
     """
     Fetch article IDs from MongoDB based on content similarity to the query.

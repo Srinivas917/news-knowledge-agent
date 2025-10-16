@@ -11,10 +11,10 @@ chain = GraphCypherQAChain.from_llm(
     graph=connection.graph,
     verbose=True,
     return_intermediate_steps=True,
-    allow_dangerous_requests=True
+    allow_dangerous_requests=True,
 )
 
 gemini_llm = ChatGoogleGenerativeAI(api_key=os.getenv("GOOGLE_API_KEY"),
     model="gemini-2.0-flash", 
-    temperature=0
+    temperature=0.1
     )

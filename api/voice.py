@@ -1,13 +1,11 @@
-
+from agents import Runner
 import whisper
 from io import BytesIO
 import streamlit as st
 import asyncio
 import nest_asyncio
 from langchain.callbacks.streamlit import StreamlitCallbackHandler
-from llmAgents.query_agent import agent_executor
-#from constants.vectorStore import vector_store, memory, retriever
-from agents import Runner
+from llmAgents.query_agent import query_agent
 import numpy as np
 import soundfile as sf
 from constants.llms import models
@@ -103,11 +101,13 @@ with st.container():
             try:
                 st_callback_container = st.container()
                 st_callback = StreamlitCallbackHandler(st_callback_container)
-                response = agent_executor.invoke(
-                    {"input":user_query
-                    },
-                     {"callbacks":[st_callback]}
-                )
+                # response = agent_executor.invoke(
+                #     {"input":user_query
+                #     },
+                #      {"callbacks":[st_callback]},
+                     
+                # )
+                response = asyncio.run(Runner.run(query_agent,system_message))
             except Exception as e:
                 error_message = f"Sorry, an error occurred: {e}"
                 st.error(error_message)
@@ -116,7 +116,8 @@ with st.container():
                 )
                 st.stop()
 
-        answer_text = str(response["output"])
+        #answer_text = str(response["output"])
+        answer_text = str(response.final_output)
         st.session_state.messages.append({"role": "assistant", "content": answer_text})
         st.session_state.main_answered = True
 
