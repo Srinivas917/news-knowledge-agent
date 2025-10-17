@@ -1,6 +1,6 @@
 from agents import Agent, Runner
 from services import mongo_tool, neo4j_tool
-from constants.vectorStore import vector_store, memory, retriever
+from services.mongo_tool import vector_store
 from langchain.memory import VectorStoreRetrieverMemory
 import asyncio
 from constants.llms import models
@@ -12,7 +12,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
+retriever = vector_store.as_retriever(search_kwargs={"k": 5})
+memory = VectorStoreRetrieverMemory(retriever=retriever, memory_key="chat_history")
 
 async def main():
     while True:
