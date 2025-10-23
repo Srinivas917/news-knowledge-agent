@@ -58,9 +58,7 @@ def handle_main_query(query: str):
             "role": "system",
             "content": (
                 "You are a helpful assistant. Always respond as 'Assistant'. "
-                "You can ask follow-up questions to clarify user intent or to continue tasks. "
-                "If the user says 'yes' or 'no', continue the previous task appropriately. "
-                "Provide clear, detailed, and engaging explanations. Avoid jargon."
+                
             ),
         },
         {"role": "user", "content": query},
