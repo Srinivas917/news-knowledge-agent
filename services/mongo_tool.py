@@ -29,7 +29,6 @@ def mongo_tool(query: str=None):
         """
     
     
-    # vector_store =  FAISS.load_local("faiss_index",embeddings=HuggingFaceEmbeddings(),allow_dangerous_deserialization=True)
     results = vector_store.similarity_search(query, k=5) 
     article_map = {str(insight.metadata["article_id"]): insight for insight in results}
     print(list(article_map.keys()))

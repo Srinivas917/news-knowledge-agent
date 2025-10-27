@@ -21,7 +21,7 @@ if "vector_store" not in st.session_state:
         st.session_state.vector_store = vector_store
         st.session_state.retriever = retriever
         st.session_state.memory = memory
-    st.success("✅ Vector store and memory initialized successfully!")
+    print("✅ Vector store and memory initialized successfully!")
 else:
     vector_store = st.session_state.vector_store
     retriever = st.session_state.retriever
@@ -57,8 +57,16 @@ def handle_main_query(query: str):
         {
             "role": "system",
             "content": (
-                "You are a helpful assistant. Always respond as 'Assistant'. "
-                
+                """
+            You are a helpful assistant named **Assistant**.  
+            Always respond as **'Assistant'**.
+
+            When responding:
+            - Ensure your answer is **clear, concise, and easy to understand**.  
+            - Use a **well-structured format** (e.g., short paragraphs, bullet points if helpful).  
+            - Avoid **irrelevant or unnecessary words**.
+            """
+
             ),
         },
         {"role": "user", "content": query},
@@ -97,22 +105,8 @@ def handle_followup_query(query: str):
 
     previous_answer = st.session_state.get("last_response", "")
 
-    if "summary" in query.lower():
-        summary_prompt = f"""
-        You are an expert content Explainer.
-        - Brief the following response in a clear and concise way.
-        - Keep original meaning intact, avoid jargon.
-        - Explain in points, include aspects + key details.
-        - If too long, pick only important parts.
-        If nothing to explain, return as it is.
-        question_response: {previous_answer}
-        history_text: {history_text}
-        """
-        with st.spinner("Summarizing..."):
-            summary = models.gemini_llm.invoke(summary_prompt)
-        answer_text = summary.content
-    else:
-        followup_prompt = f"""
+    
+    followup_prompt = f"""
 You are a helpful assistant. Answer the question using the following approach:
 1. First, answer based on the previous answer (focus on the same topic): {previous_answer}. Do NOT print the previous answer directly.
 2. Only use the context below if it is clearly relevant to the previous topic:
@@ -125,9 +119,9 @@ You are a helpful assistant. Answer the question using the following approach:
 Question: {query}
 """
 
-        with st.spinner("Thinking..."):
-            result = models.gemini_llm.invoke(followup_prompt)
-        answer_text = result.content.strip()
+    with st.spinner("Thinking..."):
+        result = models.gemini_llm.invoke(followup_prompt)
+    answer_text = result.content.strip()
 
     with st.chat_message("assistant"):
         st.markdown(answer_text)
