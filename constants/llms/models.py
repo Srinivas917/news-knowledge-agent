@@ -18,3 +18,5 @@ gemini_llm = ChatGoogleGenerativeAI(api_key=os.getenv("GOOGLE_API_KEY"),
     model="gemini-2.0-flash", 
     temperature=0.1
     )
+
+groq_llm = ChatGroq(api_key=os.getenv("GROQ_API_KEY"),model="llama-3.3-70b-versatile",temperature=0)
